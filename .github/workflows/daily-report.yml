@@ -1,0 +1,29 @@
+name: 期货日报
+
+on:
+  schedule:
+    # 北京时间 07:00 = UTC 23:00 (前一天)
+    - cron: '0 23 * * *'
+  workflow_dispatch:  # 允许手动触发
+
+jobs:
+  generate-report:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        
+    - name: Install dependencies
+      run: |
+        pip install akshare pandas requests
+        
+    - name: Generate and send report
+      env:
+        EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+      run: python main.py
